@@ -21,7 +21,7 @@ export default {
                             callback_data: 'profile'
                         },
                         {
-                            text: '⚙️ Настройки',
+                            text: '⚙️ Настройки LZT',
                             callback_data: 'lzt'
                         }
                     ],
@@ -37,18 +37,18 @@ export default {
                     ],
                     [
                         {
-                            text: '📂 Шаблоны',
-                            callback_data: 'templates'
-                        }
-                    ],
-                    [
-                        {
                             text: '🏆 Топ Проекта',
                             callback_data: 'top:all'
                         },
                         {
                             text: '📃 Информация',
                             callback_data: 'info'
+                        }
+                    ],
+                    [
+                        {
+                            text: '👥 Реферальная система',
+                            callback_data: 'templates'
                         }
                     ]
                 ]
