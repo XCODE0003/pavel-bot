@@ -46,7 +46,6 @@ export default {
                 }
             });
 
-            console.log(query.message)
             return states.set(query.from.id, {
                 action: 'addButton',
                 args: [null, id, tempMessageState.get(query.from.id), query.message.reply_markup.inline_keyboard, query.message.photo?.[query.message.photo.length - 1]]

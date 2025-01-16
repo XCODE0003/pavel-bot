@@ -9,7 +9,7 @@ export default {
     name: "vmember",
     async exec(query, [id]) {
         const t = await user.findOne({ id });
-        if(!t) return await bot.answerCallbackQuery(query.id, {
+        if (!t) return await bot.answerCallbackQuery(query.id, {
             text: "❌ Пользователь не найден"
         });
 
@@ -41,7 +41,7 @@ export default {
                     ],
                     [
                         {
-                            text: !t.blocked? `❌ Заблокировать` : `✅ Разблокировать`,
+                            text: !t.blocked ? `❌ Заблокировать` : `✅ Разблокировать`,
                             callback_data: `block:${t.id}:${!t.blocked}`
                         }
                     ],

@@ -33,26 +33,7 @@ export default {
         }
         const templates = await template.find({ owner: query.from.id });
 
-	console.log([
-                    [
-                        {
-                            text: `➕ Создать шаблон`,
-                            callback_data: `templatesb:create`
-                        }
-                    ],
-                    ...(_.chunk(templates.map(t => (
-                        {
-                            text: t.name,
-                            callback_data: `t:${t.id}`
-                        }
-                    )), 2)),
-                    [
-                        {
-                            text: '🔙 Назад',
-                            callback_data: 'templates'
-                        }
-                    ]
-                ])
+	
         await bot.editMessageCaption(query, `*📁 У вас ${decline(templates.length, ['шаблон', 'шаблона', 'шаблонов'])} *`, {
             parse_mode: 'Markdown',
             message_id: query.message.message_id,

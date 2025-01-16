@@ -77,11 +77,7 @@ export default class Database {
         startOfMonth.setDate(1);
         startOfMonth.setHours(0, 0, 0, 0);
 
-        console.log('Фильтры времени:', {
-            startOfDay: startOfDay.toISOString(),
-            startOfMonth: startOfMonth.toISOString(),
-            worker
-        });
+
 
         const [allLogs, monthLogs, dayLogs, exportedLogs] = await Promise.all([
             Log.countDocuments({
@@ -105,12 +101,7 @@ export default class Database {
             })
         ]);
 
-        console.log('Результаты запросов:', {
-            all: allLogs,
-            month: monthLogs,
-            day: dayLogs,
-            exported: exportedLogs
-        });
+
 
         const dailyLogs = await Log.find({
             worker,
@@ -118,10 +109,6 @@ export default class Database {
             bot: { $ne: 'com' }
         }).lean();
 
-        console.log('Детальная информация по логам за день:', {
-            count: dailyLogs.length,
-            timestamps: dailyLogs.map(log => new Date(log.created).toISOString())
-        });
 
         return {
             all: allLogs,
@@ -131,7 +118,6 @@ export default class Database {
         };
     }
     static async getBotStats(bot) {
-        console.log("начало запроса время: " + Date.now());
         const oneDay = 86400000;
         const oneMonth = oneDay * 30;
         const now = Date.now();
@@ -144,7 +130,6 @@ export default class Database {
                     return new Date(x.created).getDate() === new Date().getDate()
                 })
 
-            // console.log(logs.map(x => new Date(x.created).getDate()));
             return logs.length;
         })()//await Log.countDocuments({ bot, created: { $gte: now - oneDay } });
 
@@ -160,7 +145,6 @@ export default class Database {
         const oneDay = 86400000;
         const oneMonth = oneDay * 30;
         const now = Date.now();
-        console.log("начало запроса время: " + Date.now());
         const timeFilter = time !== 'all' ? {
             created: {
                 $gte: time === 'day' ? now - oneDay : now - oneMonth
@@ -200,7 +184,6 @@ export default class Database {
         ).lean();
 
         const usersMap = new Map(users.map(u => [u.id, u]));
-        console.log("конец запроса время: " + Date.now());
         return topWorkers.map(worker => {
             const user = usersMap.get(worker._id);
             return {

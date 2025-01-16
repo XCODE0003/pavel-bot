@@ -12,7 +12,6 @@ export default {
 
         if (confirm) {
             let x = await Domain.findOneAndDelete({ id })
-            console.log(x)
             if (x) {
                 await deleteZone(x.zoneId);
             }

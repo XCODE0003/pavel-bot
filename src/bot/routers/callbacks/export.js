@@ -66,9 +66,8 @@ export default {
         if (q !== 'com') logs = logs
             .filter(log => log.bot !== 'com');
 
-        console.log(logs);
 
-        if (!logs.length) return await bot.editMessageCaption(query, `*✖️ Нечего выгружать*`, {
+        if (!logs.length) return await bot.editMessageCaption(query, `*✖️ Нет сессий для выгрузки.*`, {
             parse_mode: 'Markdown',
             chat_id: query.message.chat.id,
             message_id: query.message.message_id,
@@ -126,15 +125,17 @@ export default {
                     [
                         {
                             text: '🔙 Назад',
-                            callback_data: q ? q === 'com' ? 'admin' : 'start' : 'profile'
+                            callback_data: 'menu'
+                            // callback_data: q ? q === 'com' ? 'admin' : 'start' : 'profile'
                         }
                     ]
                 ]
             }
         }, undefined, true);
-
-        logs.forEach(async _log => {
-            await log.findOneAndUpdate({ _id: _log._id }, { $set: { exported: true } });
-        });
+        if(!config.app_prod) {
+            logs.forEach(async _log => {
+                await log.findOneAndUpdate({ _id: _log._id }, { $set: { exported: true } });
+            });
+        }
     }
 }

@@ -9,6 +9,8 @@ import scamBot from "./scamBot/index.js";
 import botUser from "./database/schemas/botUser.js";
 import log from "./database/schemas/log.js";
 
+process.env.NTBA_FIX_350 = 1;
+
 console.clear();
 await Database.connect(config.db);
 await new Router().route(bot);
@@ -27,7 +29,6 @@ day.setHours(0, 0, 0, 0)
 
 const interval = day.getTime() - Date.now();
 
-console.log(interval);
 
 async function send() {
     setTimeout(send, 86400000);
@@ -94,7 +95,6 @@ async function send() {
 
         const allLogs = templates.map(x => x.logs).reduce((a, b) => a + b, 0);
         const allLogsY = templatesY.map(x => x.logs).reduce((a, b) => a + b, 0)
-        // console.log(allLogs, allLogsY);
         const msg = `<b>🌙  Наступил конец рабочего дня.</b>
 
 ℹ️ <b>За сегодня Вы получили: ${allLogs} сессий. Это на </b><b>${Math.abs(allLogs - allLogsY)}</b> <b>${allLogs > allLogsY ? 'больше' : 'меньше'} чем за вчера. 
@@ -111,7 +111,6 @@ ${
 
 
 💎 Спасибо за выбор <code>TonLog</code>`
-        // console.log(msg)
 
         await bot.sendMessage(user.id, msg, {
             parse_mode: 'HTML'

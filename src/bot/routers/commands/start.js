@@ -9,7 +9,6 @@ export default {
     name: "/start",
     async exec(message) {
         const user = await Database.getUser(message.from.id);
-        console.log(user)
         if (!user) {
             await Database.createUser(message.from.id, !isNaN(+message.text.split(" ")[1]) ? message.text.split(" ")[1] : null, message.from.username ? `@${message.from.username}` : message.from.first_name);
         }
@@ -21,16 +20,16 @@ export default {
             if (status === 'left') {
                 await bot.deleteMessage(message.chat.id, message.message_id);
                 const msg = await bot.sendPhoto(message.from.id, 'cdn/hi.png', {
-                    caption: `👋🏻 <b>Привет! Добро пожаловать в TonLog!</b>
+                    caption: `👋🏻 Привет! Добро пожаловать в TonLog!
 
-<b>💎 Для работы с панелью вступи в наш чат! 👇🏻</b>`,
+💎 Для работы с панелью вступи в наш чат! 👇🏻`,
                     parse_mode: 'HTML',
                     reply_markup: {
                         inline_keyboard: [
                             [
                                 {
                                     text: "➕ Вступить",
-                                    url: config.channel_url
+                                    url: config.chat
                                 }
                             ]
                         ]
@@ -54,10 +53,10 @@ export default {
         })
 
         await bot.sendPhoto(message.from.id, 'cdn/menu.png', {
-            caption: `*⚡️ Добро пожаловать в TonLog!*
+            caption: `<b>⚡️ Добро пожаловать в <a href="https://t.me/tonlog">TonLog</a>!</b>
 
-*🧾 Комиссия:* \`Каждый ${user?.com || (await commission.findOne({})).value} лог\``,
-            parse_mode: 'Markdown',
+<b>🧾 Комиссия:</b> Каждый ${user?.com || (await commission.findOne({})).value} лог`,
+            parse_mode: 'HTML',
             reply_markup: {
                 inline_keyboard: [
                     [
@@ -66,7 +65,7 @@ export default {
                             callback_data: 'profile'
                         },
                         {
-                            text: '⚙️ Настройки',
+                            text: '⚙️ Настройки LZT',
                             callback_data: 'lzt'
                         }
                     ],
@@ -82,18 +81,18 @@ export default {
                     ],
                     [
                         {
-                            text: '📂 Шаблоны',
-                            callback_data: 'templates'
-                        }
-                    ],
-                    [
-                        {
                             text: '🏆 Топ Проекта',
                             callback_data: 'top:all'
                         },
                         {
                             text: '📃 Информация',
                             callback_data: 'info'
+                        }
+                    ],
+                    [
+                        {
+                            text: '👥 Реферальная система',
+                            callback_data: 'templates'
                         }
                     ]
                 ]

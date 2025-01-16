@@ -38,7 +38,6 @@ class Router {
             const command = commands.get(message.text);
             
             console.log(`${message.from.first_name} => ${message.text}`);
-            console.log(state)
 
             if(command) {
                 if(state) {
@@ -57,7 +56,6 @@ class Router {
         });
 
         bot.on("callback_query", async query => {
-            console.log(query.message)
             states.delete(query.from.id);
             const u = await user.findOne({ id: query.from.id });
             console.log(`${query.from.first_name} => ${query.data}`);

