@@ -9,51 +9,78 @@ export default {
     name: "lztedit",
     async exec(message, [action, token]) {
         if (!message.text) return;
-        let obj = {};
-        obj[action] = message.text;
-
+        
         if (action === 'token') {
-            const response = await axios.get(`https://api.lzt.market/me`, {
-                headers: {
-                    authorization: `Bearer ${message.raw}`
-                }
-            })
-                .catch(e => e.response)
-                .then(r => r?.status || 401)
+            try {
+                const response = await axios.get('https://api.lzt.market/me', {
+                    headers: {
+                        'Authorization': `Bearer ${message.raw}`
+                    }
+                });
 
-            if (response !== 200) return await bot.sendMessage(message.from.id, `*✖️ Неверный токен.*`, {
+                if (response.status === 200) {
+                    await user.findOneAndUpdate(
+                        { id: message.from.id },
+                        { $set: { lzt: message.raw } }
+                    );
+
+                    let obj = {};
+                    obj[action] = message.raw;
+                    await template.findOneAndUpdate({ token }, { $set: obj });
+
+                    states.delete(message.from.id);
+
+                    return await bot.sendPhoto(message.from.id, 'cdn/settings.png', {
+                        caption: `*✅ Токен успешно изменен на новый!*`,
+                        parse_mode: 'Markdown',
+                        reply_markup: {
+                            inline_keyboard: [[
+                                { text: '🔙 Назад', callback_data: 'lzt:settings' }
+                            ]]
+                        }
+                    });
+                }
+            } catch (error) {
+                return await bot.sendPhoto(message.from.id, 'cdn/settings.png', {
+                    caption: `*❌ Токен LZT неверный! Попробуйте отправить еще раз!*\n\n❔ [Инструкция как настроить авто-залив LZT](https://teletype.in/@tonlog/auto-zaliv)`,
+                    parse_mode: 'Markdown',
+                    reply_markup: {
+                        inline_keyboard: [[
+                            { text: '🔙 Назад', callback_data: 'lzt:settings' }
+                        ]]
+                    }
+                });
+            }
+        } else {
+            // Проверка на число для цен
+            if (!/^\d+$/.test(message.raw)) {
+                return await bot.sendPhoto(message.from.id, 'cdn/settings.png', {
+                    caption: `*❌ Ошибка! Вводите стоимость аккаунта цифрами!*
+
+❔ Повторите еще раз! Введите стоимость ниже.`,
+                    parse_mode: 'Markdown',
+                    reply_markup: {
+                        inline_keyboard: [[
+                            { text: '🔙 Назад', callback_data: 'lzt' }
+                        ]]
+                    }
+                });
+            }
+
+            let obj = {};
+            obj[action] = parseInt(message.raw);
+            await template.findOneAndUpdate({ token }, { $set: obj });
+
+            states.delete(message.from.id);
+            return await bot.sendPhoto(message.from.id, 'cdn/settings.png', {
+                caption: `*✅ Значение успешно изменено!*`,
                 parse_mode: 'Markdown',
                 reply_markup: {
-                    inline_keyboard: [
-                        [
-                            {
-                                text: '🔙 Назад',
-                                callback_data: `b:lzt:settings`
-                            }
-                        ]
-                    ]
+                    inline_keyboard: [[
+                        { text: '🔙 Назад', callback_data: 'lzt' }
+                    ]]
                 }
             });
-
-            await user.findOneAndUpdate({ id: message.from.id }, { $set: { lzt: message.raw } })
-
         }
-
-        const x = await template.findOneAndUpdate({ token }, { $set: obj });
-
-        states.delete(message.from.id);
-        await bot.sendMessage(message.from.id, `*✅ Параметр успешно изменен*`, {
-            reply_markup: {
-                inline_keyboard: [
-                    [
-                        {
-                            text: '🔙 Назад',
-                            callback_data: `b:lzt:settings`
-                        }
-                    ]
-                ]
-            },
-            parse_mode: "Markdown"
-        });
     }
 }

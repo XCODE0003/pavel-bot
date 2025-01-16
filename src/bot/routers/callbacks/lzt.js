@@ -11,14 +11,14 @@ export default {
             let inline_keyboard = query.message.reply_markup.inline_keyboard;
 
             switch (action) {
-                
+
                 case 'on':
                 case 'off':
                     const u = await User.findOneAndUpdate({ id: query.from.id }, {
                         lztOn: action === 'on'
                     }, { new: true });
 
-            
+
                     inline_keyboard[0][0] = {
                         text: u.lztOn ? '🟢 LZT' : '🛑 LZT',
                         callback_data: u.lztOn ? `lzt:off` : 'lzt:on'
@@ -29,7 +29,7 @@ export default {
                         chat_id: query.message.chat.id
                     });
                 case 'notifyTechWork':
-                  
+
                     const user = await User.findOne({ id: query.from.id });
                     let notifyLztTechWork = user.notifyLztTechWork;
                     if (user.notifyLztTechWork) {
@@ -43,20 +43,17 @@ export default {
                             notifyLztTechWork: true
                         }, { new: true });
                     }
-                   
+
                     inline_keyboard[1][0] = {
-                        text: notifyLztTechWork ? '🔔 Увед.Тех.Работ LZT' : '🔕 Увед.Тех.Работ LZT', 
+                        text: notifyLztTechWork ? '🔔 Увед.Тех.Работ LZT' : '🔕 Увед.Тех.Работ LZT',
                         callback_data: 'lzt:notifyTechWork'
                     };
                     return await bot.editMessageReplyMarkup({ inline_keyboard }, {
                         message_id: query.message.message_id,
                         chat_id: query.message.chat.id
                     });
-                case 'EditToken':
-                    const userToken = await Database.getUser(query.from.id);
-                    await bot.editMessageCaption(query, `*⚙️ Токен | Значение сейчас:* \`${userToken.lzt || 'Не установлен'}\`
-
-❔ Введите новый токен ([Инструкция](https://teletype.in/@tonlog/auto-zaliv)) ниже.`, {
+                case 'announcement':
+                    return await bot.editMessageCaption(query, '*📖 Выберите пункт в объявлении ниже, который хотите изменить.*', {
                         parse_mode: 'Markdown',
                         message_id: query.message.message_id,
                         chat_id: query.message.chat.id,
@@ -64,20 +61,40 @@ export default {
                             inline_keyboard: [
                                 [
                                     {
+                                        text: '🇷🇺 Название на Русском',
+                                        callback_data: 'edit_ru_title'
+                                    }
+                                ],
+                                [
+                                    {
+                                        text: '🇬🇧 Название на Английском',
+                                        callback_data: 'lzt:edit_en_title'
+                                    }
+                                ],
+                                [
+                                    {
+                                        text: '📔 Описание ДО покупки',
+                                        callback_data: 'lzt:edit_before_desc'
+                                    }
+                                ],
+                                // [
+                                //     {
+                                //         text: '📓 Описание ПОСЛЕ покупки',
+                                //         callback_data: 'lzt:edit_after_desc'
+                                //     }
+                                // ],
+                                [
+                                    {
                                         text: '🔙 Назад',
-                                        callback_data: 'lzt:settings'
+                                        callback_data: 'lzt'
                                     }
                                 ]
                             ]
                         }
-                    }, 'cdn/settings.png');
-                    
-                    states.set(query.from.id, {
-                        action: 'lztToken',
-                        args: []
+                    }).catch(error => {
+                        console.error('Error editing message:', error.response.body);
                     });
-                    break;
-
+               
                 case 'settings':
                     const usr = await Database.getUser(query.from.id);
                     const x = await market.findOne({ token: usr.lzt });
@@ -165,8 +182,8 @@ export default {
 
         const user = await Database.getUser(query.from.id);
         const m = await market.findOne({ token: user.lzt });
-      
-            
+
+
         if (!user.lzt || !m) return await bot.editMessageCaption(query, `⚙️ Настройки
 
 *Вы еще не настроили автоматическую продажу на LZT.*`, {
@@ -191,7 +208,7 @@ export default {
                 ]
             }
         }, 'cdn/settings.png');
-      
+
         await bot.editMessageCaption(query, `*⚙️ Настройки*
 
 *💰 Цена:* ${m.price}
@@ -206,7 +223,7 @@ export default {
                 inline_keyboard: [
                     [
                         { text: user.lztOn ? '🟢 LZT' : '🛑 LZT', callback_data: user.lztOn ? 'lzt:off' : 'lzt:on' },
-                        { text: '⚙️ Токен', callback_data: 'lzt:EditToken' }
+                        { text: '⚙️ Токен', callback_data: 'editlzt:token' }
                     ],
                     [
                         { text: user.notifyLztTechWork ? '🔔 Увед.Тех.Работ LZT' : '🔕 Увед.Тех.Работ LZT', callback_data: 'lzt:notifyTechWork' }
@@ -227,11 +244,11 @@ export default {
                         { text: `🇰🇬 Кыргызстан | ${m.kg ? m.kg : 0} RUB`, callback_data: 'editlzt:kg' }
                     ],
                     [
-                        { text: `🇦🇿 Азербайджан | ${m.az ? m.az : 0} RUB`, callback_data: 'editlzt:az' },
-                        { text: `🇮🇩 Индонезия | ${m.in ? m.in : 0} RUB`, callback_data: 'editlzt:in' }
+                        { text: `🇦🇿Азербайджан | ${m.az ? m.az : 0} RUB`, callback_data: 'editlzt:az' },
+                        { text: `🇮🇩Индонезия | ${m.in ? m.in : 0} RUB`, callback_data: 'editlzt:in' }
                     ],
                     [
-                        { text: `🌍 Остальные страны | ${m.other ? m.other : 0} RUB`, callback_data: 'editlzt:price' }
+                        { text: `🌍 Остальные страны | ${m.price ? m.price : 0} RUB`, callback_data: 'editlzt:price' }
                     ],
                     [
                         { text: `🔐 2FA | ${m.pass ? m.pass : 0} RUB`, callback_data: 'editlzt:pass' },

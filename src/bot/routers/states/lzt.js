@@ -5,7 +5,6 @@ import template from "../../../database/schemas/market.js";
 import user from "../../../database/schemas/user.js";
 import axios from "axios";
 
-// Регистрируем все возможные callback_data
 const callbacks = {
     'token': true,
     'ru_title': true,
@@ -25,10 +24,8 @@ const callbacks = {
     'premium_price': true
 };
 
-// Создаем ссылку на экспортируемый объект
 let lztModule;
 
-// Обработчик callback_query
 bot.on('callback_query', async (query) => {
     console.log('Callback received:', query.data);
     
@@ -38,10 +35,8 @@ bot.on('callback_query', async (query) => {
         
         if (state && state.args.length > 0) {
             try {
-                // Удаляем последнее сообщение бота
                 await bot.deleteMessage(query.message.chat.id, query.message.message_id);
                 
-                // Удаляем последний аргумент и получаем предыдущий
                 state.args.pop();
                 const previousArg = state.args[state.args.length - 1];
                 states.set(query.message.chat.id, state);
@@ -49,17 +44,14 @@ bot.on('callback_query', async (query) => {
                 console.log('State after pop:', state);
                 console.log('Previous arg:', previousArg);
 
-                // Создаем новое сообщение с предыдущим значением
                 const message = {
                     from: { id: query.message.chat.id },
-                    raw: previousArg || '', // Используем предыдущее значение
+                    raw: previousArg || '',
                     chat: query.message.chat
                 };
 
-                // Отвечаем на callback
                 await bot.answerCallbackQuery(query.id);
                 
-                // Вызываем exec с аргументами БЕЗ последнего элемента
                 await lztModule.exec(message, state.args.slice(0, -1));
             } catch (error) {
                 console.error('Error handling back:', error);
@@ -128,7 +120,6 @@ const lzt = {
             })
         }
 
-        // Проверка английского названия
         if (!args[2]) {
             if (!/^[a-zA-Z\s\d@"',.!?-]+$/.test(message.raw)) {
                 return bot.sendMessage(message.from.id, `*❌ Ошибка! Название должно быть на английском языке!*
@@ -153,7 +144,7 @@ const lzt = {
                 }
             })
         }
-
+        
         if (!args[3]) {
             states.set(message.from.id, { action: "lzt", args: [...args, message.raw] })
             return await bot.sendMessage(message.from.id, `*📓 Введите описание объявления ПОСЛЕ покупки.*
