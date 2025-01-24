@@ -5,7 +5,11 @@ const schema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    
+    ref: {
+        type: Number,
+        default: 0
+    }
+
 });
 
 export default mongoose.model("commission", schema);

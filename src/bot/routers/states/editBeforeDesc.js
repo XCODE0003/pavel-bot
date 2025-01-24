@@ -1,4 +1,4 @@
-import { bot } from "../../index.js";
+  import { bot } from "../../index.js";
 import market from "../../../database/schemas/market.js";
 import Database from "../../../database/index.js";
 import states from "../../states.js";

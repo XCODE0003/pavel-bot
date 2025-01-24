@@ -23,7 +23,7 @@ export default {
         if (confirm) {
             await Bot.deleteMany({ owner: query.from.id });
 
-            await bot.editMessageCaption(query, "✅ *Все боты удалены*", {
+            await bot.editMessageCaption(query, "✅ *Все боты успешно удалены!*", {
                 message_id: query.message.message_id,
                 chat_id: query.message.chat.id,
                 parse_mode: "Markdown",
@@ -42,8 +42,8 @@ export default {
             return;
         }
 
-        await bot.editMessageCaption(query, "❔ *Вы точно хотите удалить всех ботов*", {
-            parse_mode: "Markdown",
+        await bot.editMessageCaption(query, "<i>❔ *Вы точно хотите удалить всех ботов*</i>", {
+            parse_mode: "HTML",
             message_id: query.message.message_id,
             chat_id: query.message.chat.id,
             reply_markup: {

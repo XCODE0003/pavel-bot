@@ -4,13 +4,14 @@ import tempMessageState from "../../tempMessageState.js";
 
 export default {
     name: "mailer",
-    async exec(message, [id]) {
+    async exec(message, [id, action]) {
         if(!message.text) return;
         states.delete(message.from.id);
         tempMessageState.set(message.from.id, message.text)
-
+        console.log(action)
         const options = { parse_mode: 'HTML', reply_markup: {
             inline_keyboard: [
+                
                 [
                     {
                         text: `➕ Добавить кнопку`,
@@ -20,13 +21,14 @@ export default {
                 [
                     {
                         text: `✅ Отправить`,
-                        callback_data: `w:${id}:s`
+                        callback_data: `w:${id}:${action || 's'}`
                     }
                 ],
                 [
                     {
                         text: '🔙 Назад',
-                        callback_data: id? `bot:${id}` : 'admin'
+                        callback_data: action == 'allBots' ? 'bots' : id? `bot:${id}` : 'admin'
+                        
                     }
                 ]
             ]

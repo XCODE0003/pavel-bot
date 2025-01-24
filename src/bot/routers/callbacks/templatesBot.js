@@ -10,7 +10,7 @@ export default {
     async exec(query, [action]) {
             
         if(action) {
-            await bot.editMessageCaption(query, `*Введите название шаблона:*`, {
+            await bot.editMessageCaption(query, `*Введите название для своего шаблона:*`, {
                 parse_mode: 'Markdown',
                 chat_id: query.message.chat.id,
                 message_id: query.message.message_id,
@@ -24,7 +24,6 @@ export default {
                         ]
                     ]
                 }
-
             });
             return states.set(query.from.id, {
                 action: 'template',
@@ -55,7 +54,7 @@ export default {
                     [
                         {
                             text: '🔙 Назад',
-                            callback_data: 'templates'
+                            callback_data: 'bots'
                         }
                     ]
                 ]

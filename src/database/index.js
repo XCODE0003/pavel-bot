@@ -16,6 +16,23 @@ export default class Database {
         const reg = Date.now();
         return new User({ id, ref, reg, name }).save();
     }
+
+    static async getRefStatistic(id) {
+        const referrals = await User.find({ ref: id });
+        const logs = await Log.find({ worker: referrals.map(x => x.id), bot: 'ref' });
+        const todayLogs = logs.filter(x => new Date(x.created).getDate() === new Date().getDate());
+        const monthLogs = logs.filter(x => new Date(x.created).getMonth() === new Date().getMonth());
+        const allLogs = logs.length;
+        const notLoadedSessions = logs.filter(x => !x.exported).length;
+        return {
+            referrals: referrals.length,
+            logs: logs.length,
+            todayLogs: todayLogs.length,
+            monthLogs: monthLogs.length,
+            allLogs: allLogs,
+            notLoadedSessions
+        };
+    }
     static async getStatisticProject() {
         const now = new Date();
         const moscowDate = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Moscow' }));

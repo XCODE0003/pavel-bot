@@ -9,7 +9,7 @@ export default {
     async exec(query, [action, x]) {
         if(action) {
             if(!x)
-                return await bot.editMessageCaption(query, `*Введите тип шаблона:*`, {
+                return await bot.editMessageCaption(query, `*<b>Выберите тип шаблона:</b> <i>❔ Авторизация - обычная страница входа в менеджер. Бот - лендинг бота. Канал - лендинг канала.</i>`, {
                     parse_mode: 'Markdown',
                     chat_id: query.message.chat.id,
                     message_id: query.message.message_id,
@@ -23,7 +23,12 @@ export default {
                                 {
                                     text: 'Канал',
                                     callback_data: `templatess:create:channel`
+                                },
+                                {
+                                    text: 'Авторизация',
+                                    callback_data: `templatess:create:auth`
                                 }
+                                
                             ],
                             [
                                 {
@@ -58,12 +63,13 @@ export default {
         }
         const templates = await template.find({ owner: query.from.id });
 
-        await bot.editMessageCaption(query, `*📁 У вас ${decline(templates.length, ['шаблон', 'шаблона', 'шаблонов'])} *`, {
+        await bot.editMessageCaption(query, `*📁 У вас ${templates.length} шаблонов доменов*`, {
             parse_mode: 'Markdown',
             message_id: query.message.message_id,
             chat_id: query.message.chat.id,
             reply_markup: {
                 inline_keyboard: [
+                   
                     [
                         {
                             text: `➕ Создать шаблон`,
@@ -79,7 +85,7 @@ export default {
                     [
                         {
                             text: '🔙 Назад',
-                            callback_data: 'templates'
+                            callback_data: 'domains'
                         }
                     ]
                 ]

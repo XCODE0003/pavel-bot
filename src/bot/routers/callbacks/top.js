@@ -27,7 +27,7 @@ export default {
 
         try {
             await bot.editMessageCaption(query,
-                `<b>🏆 Топ партнеров за ${timeLabels[time]}</b>\n\n${topUsersText}`,
+                `<b>🏆 Топ партнеров ${timeLabels[time]}</b>\n\n${topUsersText}`,
                 {
                     parse_mode: 'HTML',
                     message_id: query.message.message_id,

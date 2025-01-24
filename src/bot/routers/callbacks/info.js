@@ -32,14 +32,20 @@ export default {
                             url: config.owner
                         },
                         {
-                            text: '👤 Чат',
+                            text: '👤 Наш чат',
                             url: config.chat
                         }
                     ],
                     [
                         {
-                            text: '📄 Канал',
+                            text: '📄Наш Канал',
                             url: config.channel_url
+                        }
+                    ],
+                    [
+                        {
+                            text: '📚 Знакомство с панелью ',
+                            url: 'https://teletype.in/@tonlog/znakomstvo'
                         }
                     ],
                     [

@@ -21,8 +21,9 @@ export default {
         if(!message.text) return;
         if(!args[1]) {
             states.set(message.from.id, { action: "templates", args: [...args, message.text]})
-            return await bot.sendMessage(message.from.id, args[0] === 'bot'? `*Введите username:\n\n💡 Пример: @username*` : `*Введите количество подписчиков\n\n💡 Пример: *10 000`, {
-                parse_mode: 'Markdown',
+            return await bot.sendMessage(message.from.id, args[0] === 'bot'? `<b>📘 Введите username бота</b>
+❔ Username будет отображаться на странице лендинга\n💡 Пример: @tonlogpanelbot` : `<b>📘 Введите количество подписчиков</b>💡 Пример: <code>10 000</code>`, {
+                parse_mode: 'HTML',
                 reply_markup
             })
         }
@@ -35,9 +36,13 @@ export default {
             }
             
             states.set(message.from.id, { action: "templates", args: [...args, message.text]})
-            return await bot.sendMessage(message.from.id, `<b>Отправьте прямую ссылку на аватарку:
-                
-💡 Загрузить аватарку можно через </b><a href="https://imgur.com/"><b>imgur.com</b></a>`, {
+            return await bot.sendMessage(message.from.id, `<b>🖼 Отправьте адрес ссылки на аватарку.
+
+1. Перейдите на сайт </b><a href="https://imgur.com/"><b>imgur.com</b></a>
+2. <b>Нажмите права вверху "New Post"</b>
+3. <b>Выберите медиафайл, загрузите его</b>
+4. <b>Нажмите на фотографию правой кнопкой мышки и нажмите "копировать URL картинки"</b>
+5. <b>Отправьте полный адрес ссылки в чат</b>`, {
                 parse_mode: 'HTML',
                 reply_markup
             })

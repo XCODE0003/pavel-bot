@@ -21,8 +21,9 @@ export default {
             //         ]
             //     }
             // });
-            await bot.editMessageCaption(query, `*Введите домен*`, {
-                parse_mode: 'Markdown',
+            await bot.editMessageCaption(query, `<b>📝 Введите адрес своего домена.</b>
+<i>❔Пример: tonlog.com</i>`, {
+                parse_mode: 'HTML',
                 chat_id: query.message.chat.id,
                 message_id: query.message.message_id,
                 reply_markup: {
@@ -49,6 +50,12 @@ export default {
             chat_id: query.message.chat.id,
             reply_markup: {
                 inline_keyboard: [
+                    [
+                        {
+                            text: '📂 Шаблоны доменов',
+                            callback_data: 'templatess'
+                        }
+                    ],
                     [
                         {
                             text: `➕ Добавить домен`,

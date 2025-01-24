@@ -4,6 +4,7 @@ import log from "../../../database/schemas/log.js";
 import { exportLogs } from "../../../utils/index.js";
 import fs from 'fs';
 import Bot from "../../../database/schemas/bot.js";
+import config from "../../../../config.json" assert { type: "json" };
 
 export default {
     name: "export",
@@ -125,7 +126,7 @@ export default {
                     [
                         {
                             text: '🔙 Назад',
-                            callback_data: 'menu'
+                            callback_data: 'bots'
                             // callback_data: q ? q === 'com' ? 'admin' : 'start' : 'profile'
                         }
                     ]

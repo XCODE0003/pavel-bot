@@ -42,8 +42,8 @@ export default {
             return;
         }
 
-        await bot.editMessageCaption(query, "❔ *Вы точно хотите удалить все домены*", {
-            parse_mode: "Markdown",
+        await bot.editMessageCaption(query, "<i>❔ Вы уверены что хотите удалить все домены?</i>", {
+            parse_mode: "HTML",
             message_id: query.message.message_id,
             chat_id: query.message.chat.id,
             reply_markup: {

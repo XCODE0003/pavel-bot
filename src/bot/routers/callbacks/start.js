@@ -7,6 +7,7 @@ export default {
     name: "start",
     async exec(query) {
         const user = await Database.getUser(query.from.id);
+        
         await bot.editMessageCaption(query, `*⚡️ Добро пожаловать в TonLog!*
 
 *🧾 Комиссия:* \`Каждый ${user.com || (await commission.findOne({})).value} лог\``, {
@@ -48,7 +49,7 @@ export default {
                     [
                         {
                             text: '👥 Реферальная система',
-                            callback_data: 'templates'
+                            callback_data: 'ref_system'
                         }
                     ]
                 ]

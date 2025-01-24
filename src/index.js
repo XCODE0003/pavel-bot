@@ -97,20 +97,19 @@ async function send() {
         const allLogsY = templatesY.map(x => x.logs).reduce((a, b) => a + b, 0)
         const msg = `<b>🌙  Наступил конец рабочего дня.</b>
 
-ℹ️ <b>За сегодня Вы получили: ${allLogs} сессий. Это на </b><b>${Math.abs(allLogs - allLogsY)}</b> <b>${allLogs > allLogsY ? 'больше' : 'меньше'} чем за вчера. 
+ℹ️ <b>За сегодня Вы получили: ${allLogs} сессий. Это на </b><b>${Math.abs(allLogs - allLogsY)}</b> <b>${allLogs > allLogsY ? 'больше' : 'меньше'} чем за вчера.</b>
 
-⚡️ Статистика по шаблонам:
-</b>
+⚡️ <b>Статистика по шаблонам:</b>
+
 ${
     templates.map(t => {
-        return `🤖 <b>${t.template}</b>: 
-<b>🚀 Запуски:</b> <code>${t.starts}</code>
-<b>📊 Получено логов:</b> <code>${t.logs}</code>`
+        return `🤖 <b>${t.template}</b>:
+🚀 <b>Запуски:</b> <code>${t.starts}</code>
+📊 <b>Получено логов:</b> <code>${t.logs}</code>`
     }).join('\n\n')
 }
 
-
-💎 Спасибо за выбор <code>TonLog</code>`
+💎 Спасибо за выбор <code>TonLog</code>!`
 
         await bot.sendMessage(user.id, msg, {
             parse_mode: 'HTML'

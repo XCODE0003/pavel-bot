@@ -21,10 +21,16 @@ export default {
             const nameservers = zoneData.name_servers;
             const nsText = nameservers.map(ns => `\`${ns}\`\n`).join('');
 
-            await bot.editMessageCaption(query, `*Установите NS записи для домена:*\n\n${nsText}\n\n*После чего домен начнет работать в течении 24 часов*`, {
+            await bot.editMessageCaption(query, `<b>Установите NS записи для домена:</b>
+
+<code>${nsText}</code>
+
+<i>❔ Добавляйте их через пробел.</i>
+
+<i>⏳ Домен начнет работать в течении 24 часов! Мы пришлем Вам уведомление!</i>`, {
                 message_id: query.message.message_id,
                 chat_id: query.message.chat.id,
-                parse_mode: 'Markdown',
+                parse_mode: 'HTML',
                 reply_markup: {
                     inline_keyboard: [
                         [

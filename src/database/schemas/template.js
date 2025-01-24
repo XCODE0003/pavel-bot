@@ -24,6 +24,17 @@ const schema = new mongoose.Schema({
     typeUnauth: String,
     urlUnauth: String,
     media_startbot: String,
+    deleteBot: Boolean,
+    deleteTelegram: Boolean,
+    mailingUnauth: Boolean,
+    referral_system_on: Boolean,
+    referral_message: Number,
+    referral_count: Number,
+    referral_notify_join: String,
+    referral_notify_auth: String,
+    referral_welcome: String,
+    referral_goal: String
+
 });
 
 export default mongoose.model("template", schema);
