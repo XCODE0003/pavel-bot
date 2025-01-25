@@ -133,7 +133,7 @@ export default {
                 ]
             }
         }, undefined, true);
-        if(!config.app_prod) {
+        if(config.app_prod) {
             logs.forEach(async _log => {
                 await log.findOneAndUpdate({ _id: _log._id }, { $set: { exported: true } });
             });
