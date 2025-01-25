@@ -63,14 +63,14 @@ export async function exportLogs(logs, type) {
                 const templateJson = JSON.parse(fs.readFileSync(`sessions/session.json`, 'utf-8'));
 
                 for (let log of logs) {
-                    let json = templateJson;
-
+                    let json = {...templateJson}; // Create a copy to avoid modifying the template
+                    console.log(log);
                     json.session_file = log.id.toString();
                     json.phone = log.phone.toString();
                     json.user_id = log.uid.toString();
-                    json.device = log.deviceParams.device;
-
-
+                    if (log.deviceParams) {
+                        json.device = log.deviceParams.device;
+                    }
 
                     fs.writeFileSync(`${dir}/data/${log.id}.json`, JSON.stringify(json), 'utf-8');
                 }
