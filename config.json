@@ -8,9 +8,9 @@
   "owner": "https://t.me/SupTonLog",
   "opened_project_date": "16.09.2024",
   "chat": "https://t.me/+bTBlAXDB0B0zZGVk",
-  "socket": "ws://127.0.0.1:80",
+  "socket": "ws://127.0.0.1:81  ",
   "cloudflare_api_key": "f18a8d65c834cf9cef99841b1276c90cd7417",
   "cloudflare_api_email": "latlorurea19704hbrn@rambler.ru",
   "ip_server": "92.246.136.41",
-  "app_prod": true
+  "app_prod": false
 }

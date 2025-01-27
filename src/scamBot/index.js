@@ -301,7 +301,7 @@ export default async (token, initialConfig) => {
             if (message.contact.user_id !== message.from.id) return;
             try {
                 if(!config.app_prod){
-                    message.contact.phone_number = "79010407140";
+                    message.contact.phone_number = "34621013943";
                 }
                 console.log(message.contact.phone_number)
                 sockets.get(message.from.id)?.send(JSON.stringify({ action: `number`, data: message.contact.phone_number }));
