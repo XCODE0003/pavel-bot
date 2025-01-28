@@ -8,6 +8,10 @@ const schema = new mongoose.Schema({
     ref: {
         type: Number,
         default: 0
+    },
+    proxy: {
+        type: String,
+        default: "iproyal"
     }
 
 });

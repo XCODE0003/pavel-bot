@@ -8,7 +8,7 @@ export default {
         if(!message.text) return;
         states.delete(message.from.id);
         tempMessageState.set(message.from.id, message.text)
-        console.log(action)
+        
         const options = { parse_mode: 'HTML', reply_markup: {
             inline_keyboard: [
                 

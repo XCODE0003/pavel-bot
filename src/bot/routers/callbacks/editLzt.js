@@ -27,18 +27,26 @@ export default {
         if(!t) return await bot.answerCallbackQuery(query.id, {
             text: "❌"
         });
+        let message = '';
+        if(action === 'token') {
+            message = `*Значение сейчас:* \`${t[action]}\`
+
+❔ Введите новый токен ниже.`;
+        }else{
+            message = `*${priceNames[action]} | Значение сейчас:* \`${t[action] || '0'} RUB\`
+
+❔ Введите новую стоимость ниже.`;
+        }
 
         states.set(query.from.id, { action: 'lztedit', args: [action, t.token] })
-        await bot.editMessageCaption(query, `*${priceNames[action]} | Значение сейчас:* \`${t[action] || '0'} RUB\`
-
-❔ Введите новую стоимость ниже.`, {
+        await bot.editMessageCaption(query, message, {
             parse_mode: "Markdown",
             reply_markup: {
                 inline_keyboard: [
                     [
                         {
                             text: '🔙 Назад',
-                            callback_data: `lzt:settings`
+                            callback_data: `lzt`
                         }
                     ]
                 ]

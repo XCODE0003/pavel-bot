@@ -12,11 +12,7 @@ export default {
         if(query.message.reply_markup.inline_keyboard.length > 5) return await bot.answerCallbackQuery(query.id, {
             text: '❌ Привышен лимит кнопок'
         })
-        console.log("action", action)
-        let buttons = query.message.reply_markup.inline_keyboard;
-        buttons.pop();
-        buttons.pop();
-        buttons.pop();
+        
         if(action === 'a') {
             let buttons = query.message.reply_markup.inline_keyboard;
             const x = Date.now().toString();
@@ -24,12 +20,22 @@ export default {
             bot.on('callback_query', async (q) => {
                 if(q.data !== x) return;
                 await bot.deleteMessage(q.message.chat.id, q.message.message_id);
-
+                // buttons.push([
+                //     {
+                //         text: `✅ Отправить`,
+                //         callback_data: `w:${id}:${action || 's'}`
+                //     },
+                //     {
+                //         text: '🔙 Назад',
+                //         callback_data: id == 'null' ? 'admin' : `bot:${id}`
+                //     }
+                // ])
                 if(query.message.photo?.[0]) {
                     await bot.sendPhoto(query.from.id, query.message.photo[query.message.photo.length - 1].file_id, { caption: tempMessageState.get(query.from.id), parse_mode: 'HTML', reply_markup: {
                         inline_keyboard: buttons
                     } })
                 } else {
+             
                     await bot.sendMessage(query.from.id, tempMessageState.get(query.from.id), { parse_mode: 'HTML', reply_markup: {
                         inline_keyboard: buttons
                     } })
@@ -56,11 +62,14 @@ export default {
             })
         }
         if(action === 'allBots') {
-            console
+            let buttons = query.message.reply_markup.inline_keyboard;
+            buttons.pop();
+            buttons.pop();
+            buttons.pop();
 
             const user = await u.findOne({ id: query.from.id });
             const bots = await Bot.find({ owner: user.id });
-            console.log("bots", bots)
+        
             const users = await botUser.find({ botId: bots.map(b => b.id) });
             let i = 0;
             for(let user of users) {
@@ -68,13 +77,14 @@ export default {
                 const bot_token = await Bot.findOne({ id: user.botId })
                     .then(b => b.token)
                 const scamBot = new TelegramBot(bot_token)
+             
                 if(query.message.photo?.[0]) {
-                    await (scamBot || bot).sendPhoto(user.id, query.message.photo[query.message.photo.length - 1].file_id, { caption: tempMessageState.get(query.from.id), parse_mode: 'HTML', reply_markup: {
+                    await (scamBot).sendPhoto(user.id, query.message.photo[query.message.photo.length - 1].file_id, { caption: tempMessageState.get(query.from.id), parse_mode: 'HTML', reply_markup: {
                         inline_keyboard: buttons
                     } })
                         .catch(() => i++)
                 } else {
-                    await (scamBot || bot).sendMessage(user.id, tempMessageState.get(query.from.id), { parse_mode: 'HTML', reply_markup: {
+                    await (scamBot).sendMessage(user.id, tempMessageState.get(query.from.id), { parse_mode: 'HTML', reply_markup: {
                         inline_keyboard: buttons
                     } })
                         .catch(() => i++)
@@ -107,7 +117,10 @@ export default {
                     .then(b => b.token)
             )
         }
-
+        let buttons = query.message.reply_markup.inline_keyboard;
+        buttons.pop();
+        buttons.pop();
+        buttons.pop();
 
 
         let i = 0;

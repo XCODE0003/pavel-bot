@@ -9,7 +9,7 @@ import TelegramBot from "node-telegram-bot-api";
 export default {
     name: "profile",
 
-    async exec(query) {
+    async exec(query, [action]) {
         const [
             user,
             logsUser,
@@ -27,11 +27,10 @@ export default {
             }),
             new TelegramBot(config.notify_token, { polling: false }).getMe()
         ]);
-
         const registeredDays = Math.floor((Date.now() - user.reg) / (1000 * 60 * 60 * 24));
         const registered = declineDays(registeredDays);
 
-        await bot.editMessageCaption(query, `*💻 Личный кабинет*
+        let message = `*💻 Личный кабинет*
 
 *🆔 Ваш ID:* \`${query.from.id}\`
 *🧾 Комиссия:* \`Каждый ${user.com || commissionDoc.value} лог\`
@@ -43,7 +42,31 @@ export default {
 
 
 *📆 В команде:* \`${registered}\`
-*📁 Общее количество не выгруженных сессий:* \`${unexportedLogsCount}\``, {
+*📁 Общее количество не выгруженных сессий:* \`${unexportedLogsCount}\``;
+
+
+        if(action === 'toggle') {
+            let keyboard = query.message.reply_markup.inline_keyboard;
+            let report_day = user.report_day;
+            await user.updateOne({ $set: { report_day: !report_day } });
+            report_day = !report_day;
+                
+            keyboard[1][0].text = `📊 Отчет дня ${report_day ? '🟢' : '🔴'}`;
+            
+            return await bot.editMessageCaption(query, message, {
+                reply_markup: {
+                    inline_keyboard: keyboard
+                },
+                parse_mode: 'MarkdownV2',
+                message_id: query.message.message_id,
+                chat_id: query.message.chat.id
+            }, 'cdn/profile.png');
+        }
+      
+
+      
+
+        await bot.editMessageCaption(query, message, {
             parse_mode: 'MarkdownV2',
             message_id: query.message.message_id,
             chat_id: query.message.chat.id,
@@ -61,8 +84,8 @@ export default {
                     ],
                     [
                         {
-                            text: '📊 Отчет дня 🟢',
-                            callback_data: `export:${query.from.id}`
+                            text: `📊 Отчет дня ${user.report_day ? '🟢' : '🔴'}`,
+                            callback_data: `profile:toggle:${query.from.id}`
                         },
 
                     ],

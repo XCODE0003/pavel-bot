@@ -8,8 +8,13 @@ export default {
     name: "procent",
     async exec(query, [a, id]) {
         if(a) {
-            await bot.editMessageText(`*Введите новое значение*`, {
-                parse_mode: "Markdown",
+            await bot.sendMessage(query.message.chat.id, `🧾 Введите комиссию панели.
+                
+<b>Значение сейчас:</b> ${(await commission.findOne({ })).value}
+
+
+<b>Введите новое значение:</b>`, {
+                parse_mode: "HTML",
                 reply_markup: {
                     inline_keyboard: [
                         [
@@ -19,10 +24,8 @@ export default {
                             }
                         ]
                     ]
-                },
-                message_id: query.message.message_id,
-                chat_id: query.message.chat.id,
-            })
+                }
+            });
 
             return states.set(query.from.id, {
                 action: 'com',

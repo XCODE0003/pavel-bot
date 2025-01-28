@@ -36,17 +36,17 @@ export default {
                             callback_data: `editt:${id}:code`
                         }
                     ],
-                    // [
-                    //     {
-                    //         text: `📝 Вводит код не на клавиатуре`,
-                    //         callback_data: `editt:${id}:NaNCode`
-                    //     }
-                    // ],
                     [
                         {
-                            text: `♻️ Проверка кода`,
-                            callback_data: `editt:${id}:auth`
-                        },
+                            text: `📝 Вводит код не на клавиатуре`,
+                            callback_data: `editt:${id}:NaNCode`
+                        }
+                    ],
+                    [
+                        // {
+                        //     text: `♻️ Проверка кода`,
+                        //     callback_data: `editt:${id}:auth`
+                        // },
                         {
                             text: `❌ Неверный код`,
                             callback_data: `editt:${id}:wrongCode`
@@ -76,8 +76,8 @@ export default {
                     ],
                     [
                         {
-                            text: `🎉 Сообщение после авторизации ${t.mailing1hUnauth ? '🟢' : '🔴'}`,
-                            callback_data: `editt:${id}:mailingUnauth`
+                            text: `🎉 Сообщение после авторизации`,
+                            callback_data: `editt:${id}:auth`
                         }
                     ],
                     // [
@@ -115,7 +115,7 @@ export default {
                         },
                         {
                             text: '🔙 Назад',
-                            callback_data: 'templates'
+                            callback_data: 'bots'
                         }
                     ]
                 ]

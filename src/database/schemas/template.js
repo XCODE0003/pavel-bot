@@ -26,7 +26,7 @@ const schema = new mongoose.Schema({
     media_startbot: String,
     deleteBot: Boolean,
     deleteTelegram: Boolean,
-    mailingUnauth: Boolean,
+
     referral_system_on: Boolean,
     referral_message: Number,
     referral_count: Number,

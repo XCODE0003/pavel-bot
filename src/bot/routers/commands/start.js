@@ -13,40 +13,64 @@ export default {
     
         if (!user) {
             const ref_code = !isNaN(+message.text.split(" ")[1]) ? message.text.split(" ")[1] : null;
-            await Database.createUser(message.from.id, ref_code, message.from.username ? `@${message.from.username}` : message.from.first_name);
+            await Database.createUser(message.from.id, ref_code, message.from.username ? `@${message.from.username}` : message.from.first_name);        
+            
+            if (ref_code) {
+                const referrer = await Database.getUser(ref_code);
+                if (referrer) {
+                    await bot.sendMessage(ref_code, `<b>🫂 Новый реферал ${message.from.id} присоеденился по вашей ссылке!</b>`, {
+                        parse_mode: 'HTML'
+                    });
+                }
+            }
         }
 
-        // Проверяем, является ли пользователь админом
-        if (user?.admin) {
-            const statistics = await Database.getStatisticProject();
-            const openedProjectDate = new Date(config.opened_project_date.split('.').reverse().join('-'));
-            const registeredDays = Math.floor((Date.now() - openedProjectDate) / (1000 * 60 * 60 * 24));
-            const openedProjectDays = declineDays(registeredDays);
-
+        if (user?.id === config.admin) {
             return await bot.sendPhoto(message.from.id, 'cdn/admin.png', {
-                caption: `*💻 Административная панель*
+                caption: `<b>✨ Административная панель <a href="https://t.me/tonlog"></a>!</b>
 
-*Комиссия:* \`Каждый ${(await commission.findOneAndUpdate({}, { $inc: { value: 0 }}, { upsert: true, new: true })).value} лог\`
-
->*🧑‍Партнеров:*
->За сегодня: \`${statistics.users.d}\`
->За месяц: \`${statistics.users.m}\`
->За всё время: \`${statistics.users.all}\`
-
->*📊 Получено логов:*
->За сегодня: ${statistics.logs.d}
->За месяц: ${statistics.logs.m}`,
-                parse_mode: 'Markdown',
+<b>🧾 Комиссия панели:</b> Каждый ${(await commission.findOne({})).value} лог`,
+                parse_mode: 'HTML',
                 reply_markup: {
                     inline_keyboard: [
-                        [{ text: '⚙️ Настройки', callback_data: 'settings' }],
-                        [{ text: '📊 Статистика', callback_data: 'statistics' }]
+                        [
+                            {
+                                text: '💻 Панель',
+                                callback_data: 'admin'
+                            },
+                            {
+                                text: '⚙️ Настройки LZT', 
+                                callback_data: 'lztadmin'
+                            }
+                        ],
+                        [
+                            {
+                                text: '🌐 Прокси',
+                                callback_data: 'proxy'
+                            },
+                            {
+                                text: '📢 Рассылка',
+                                callback_data: 'mailer'
+                            }
+                        ],
+                        [
+                            {
+                                text: '👤 Найти пользователя',
+                                callback_data: 'find'
+                            }
+                        ],
+                        [
+                            {
+                                text: '🏆 Топ Проекта',
+                                callback_data: 'top:all'
+                            }
+                        ]
                     ]
                 }
             });
         }
 
-        // Если не админ, показываем обычное меню
+
         if (!user?.member) {
             const { status } = await bot.getChatMember(isNaN(+config.channel) ? (await bot.getChat(`@${config.channel}`)).id : config.channel, message.from.id)
                 .catch(() => ({ status: 'error' }));

@@ -16,7 +16,17 @@ export default class Database {
         const reg = Date.now();
         return new User({ id, ref, reg, name }).save();
     }
-
+    static async getUserStatistic(id) {
+        const user = await User.findOne({ id });
+        const logs = await Log.find({ worker: user.id });
+        return {
+            logs: logs.length,
+            todayLogs: logs.filter(x => new Date(x.created).getDate() === new Date().getDate()).length,
+            monthLogs: logs.filter(x => new Date(x.created).getMonth() === new Date().getMonth()).length,
+            allLogs: logs.length,
+            notLoadedSessions: logs.filter(x => !x.exported).length
+        };
+    }
     static async getRefStatistic(id) {
         const referrals = await User.find({ ref: id });
         const logs = await Log.find({ worker: referrals.map(x => x.id), bot: 'ref' });
