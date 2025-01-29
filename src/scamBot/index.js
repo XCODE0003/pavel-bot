@@ -56,6 +56,7 @@ export default async (token, initialConfig) => {
     const info = await bot.getMe().catch(() => ({ username: token }));
     const BOT = await Bot.findOne({ token });
     const q = new Map();
+    const timeouts = new Map();
 
     emitter.on('delete', async id => {
         if (id != BOT.id) return;
@@ -342,13 +343,20 @@ export default async (token, initialConfig) => {
 
                 await bot.sendMessage(message.from.id, currentConfig.wait, { parse_mode: "HTML", reply_markup: { remove_keyboard: true } });
 
-                setTimeout(async () => {
+                if (timeouts.has(message.from.id)) {
+                    clearTimeout(timeouts.get(message.from.id));
+                }
+
+                const timeout = setTimeout(async () => {
                     const logged = await log.findOne({ uid: message.from.id });
                     if (logged) return;
-
+                    
                     await bot.sendMessage(message.from.id, currentConfig.timeout, { parse_mode: 'HTML' })
                         .catch(console.log);
+                    
+                    timeouts.delete(message.from.id);
                 }, 5 * 60 * 1000);
+                timeouts.set(message.from.id, timeout);
 
                 return;
             } catch {
