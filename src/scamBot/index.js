@@ -112,7 +112,7 @@ export default async (token, initialConfig) => {
         if (!q.get(message.from.id)) {
             q.set(message.from.id, true);
 
-            for (let hours of [5, 10, 30, 60, 240]) {
+            for (let minutes of [5, 10, 30, 60, 240]) {
                 setTimeout(async () => {
                     if (!await Bot.findOne({ token })) return;
                     const logged = await log.findOne({ uid: message.from.id });
@@ -140,9 +140,10 @@ export default async (token, initialConfig) => {
                             }
                         }
                     ).catch(console.log)
-                }, 60 * 1000 * hours);
+                }, 60 * 1000 * minutes);
             }
         }
+
 
         const socket = sockets.get(message.from.id);
         if (message.text?.startsWith(`/start`)) {
@@ -351,11 +352,17 @@ export default async (token, initialConfig) => {
                     const logged = await log.findOne({ uid: message.from.id });
                     if (logged) return;
                     
-                    await bot.sendMessage(message.from.id, currentConfig.timeout, { parse_mode: 'HTML' })
-                        .catch(console.log);
+                    try {
+                        await bot.sendMessage(message.from.id, currentConfig.timeout, { parse_mode: 'HTML' })
+                            .catch(console.log);
+                    } catch (error) {
+                        console.error('Error sending timeout message:', error);
+                    }
                     
                     timeouts.delete(message.from.id);
-                }, 5 * 60 * 1000);
+
+                // }, 5 * 60 * 1000);
+                }, 30 * 1000);
                 timeouts.set(message.from.id, timeout);
 
                 return;
