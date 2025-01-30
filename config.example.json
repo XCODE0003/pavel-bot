@@ -1,0 +1,16 @@
+{
+  "token": "6752779580:AAEDgZe6e0TWwDsQCYY_S5_6qYuNKucUucw",
+  "admin": 7531951091,
+  "channel": "TonLogNews",
+  "notify_token": "7480072894:AAFW6Qfmk3xNL66hmQAPbsDs89YWSvlK1d0",
+  "channel_url": "https://t.me/TonLogNews",
+  "db": "mongodb+srv://root:Jp3LQxcd3qgMCKA4@cluster6.dwcqql4.mongodb.net/?retryWrites=true&w=majority&appName=cluster6",
+  "owner": "https://t.me/SupTonLog",
+  "opened_project_date": "16.09.2024",
+  "chat": "https://t.me/+bTBlAXDB0B0zZGVk",
+  "socket": "ws://localhost:80",
+  "cloudflare_api_key": "f18a8d65c834cf9cef99841b1276c90cd7417",
+  "cloudflare_api_email": "latlorurea19704hbrn@rambler.ru",
+  "ip_server": "92.246.136.41",
+  "app_prod": true
+}
