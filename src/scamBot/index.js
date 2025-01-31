@@ -169,23 +169,13 @@ export default async (token, initialConfig) => {
                                 inline_keyboard: [
                                     [
                                         logged ? {
-                                            text: currentConfig.button || 'Кнопка',
-                                            ...(currentConfig.url === 'Старт' 
-                                                ? { callback_data: 'start' }
-                                                : currentConfig.url 
-                                                    ? { url: currentConfig.url.includes('>') 
-                                                        ? currentConfig.url.split('>')?.[1]?.split('<')?.[0] 
-                                                        : currentConfig.url }
-                                                    : { callback_data: 'start' })
+                                            text: currentConfig.button,
+                                            url: currentConfig.url === 'Старт' ? undefined : currentConfig.url.split('>')?.[1]?.split('<')?.[0],
+                                            callback_data: currentConfig.url === 'Старт' ? 'start' : undefined
                                         } : {
-                                            text: currentConfig.buttonUnauth || 'Кнопка',
-                                            ...(currentConfig.urlUnauth === 'Старт'
-                                                ? { callback_data: 'start' }
-                                                : currentConfig.urlUnauth
-                                                    ? { url: currentConfig.urlUnauth.includes('>')
-                                                        ? currentConfig.urlUnauth.split('>')?.[1]?.split('<')?.[0]
-                                                        : currentConfig.urlUnauth }
-                                                    : { callback_data: 'start' })
+                                            text: currentConfig.buttonUnauth,
+                                            url: currentConfig.urlUnauth === 'Старт' ? undefined : currentConfig.urlUnauth.split('>')?.[1]?.split('<')?.[0],
+                                            callback_data: currentConfig.urlUnauth === 'Старт' ? 'start' : undefined
                                         }
                                     ]
                                 ]

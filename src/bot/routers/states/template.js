@@ -193,7 +193,7 @@ _❔ Пример: Ожидайте..._`, {
                     inline_keyboard: [
                         [
                             {
-                                text: 'Стрт',
+                                text: 'Старт',
                                 callback_data: START
                             },
                             {
